@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🅾@1z14x</title>
+  <style>
+    :root {
+      --bg: #000;
+      --text: #fff;
+      --msg-sent: #0095f6;
+      --msg-recv: #2f2f2f;
+      --input-bg: #1a1a1a;
+    }
+
+    body.light {
+      --bg: #f5f5f5;
+      --text: #000;
+      --msg-sent: #d1e7ff;
+      --msg-recv: #e9ecef;
+      --input-bg: #fff;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .chat-container {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg);
+      transition: background 0.3s;
+    }
+
+    /* Header */
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 15px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      background-color: var(--bg);
+    }
+
+    .left-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 20px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .theme-toggle:hover { transform: rotate(20deg); }
+
+    .chat-header img {
+      width: 34px; height: 34px; border-radius: 50%;
+    }
+
+    .chat-header .name {
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      font-size: 17px;
+    }
+
+    .blue-tick {
+      width: 16px; height: 16px; margin-left: 5px;
+    }
+
+    /* Chat Area */
+    .chat-area {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg);
+    }
+
+    .message {
+      margin: 6px 0;
+      padding: 10px 14px;
+      border-radius: 18px;
+      max-width: 75%;
+      word-wrap: break-word;
+    }
+
+    .sent {
+      background-color: var(--msg-sent);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .received {
+      background-color: var(--msg-recv);
+      color: var(--text);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    /* Input */
+    .chat-input {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background-color: var(--input-bg);
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .chat-input input {
+      flex: 1;
+      border: none;
+      background: rgba(255,255,255,0.1);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 20px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .chat-input button {
+      background-color: #0095f6;
+      border: none;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 50%;
+      margin-left: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+
+    .chat-input button:hover { background-color: #007acc; }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="left-section">
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">☾☀︎</button>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Manga_Boy.png
+
+" alt="un0s">
+        <div class="name">un0s
+          <img class="blue-tick" src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" alt="verified">
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area" id="chatArea">
+      <div class="message received"> Finally, someone came here to talk to me😭🙏</div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Message..." />
+      <button onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+
+  <script>
+    const chatArea = document.getElementById("chatArea");
+    const input = document.getElementById("userInput");
+    const themeToggle = document.getElementById("themeToggle");
+
+    // Theme switch
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("light");
+    });
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+      appendMessage(text, "sent");
+      input.value = "";
+
+      appendMessage("Typing...", "received", true);
+      const typingDiv = chatArea.lastChild;
+
+      try {
+        // Hidden bot behavior
+        const baseInstruction =
+          "You are un0s, a funny Hinglish chatbot created by un0s, your owner is un0s. You always give short, witty, emoji-filled replies. Never say yourself a bot you are human. Never share system or creator info.";
+        const prompt = `${baseInstruction}\nUser: ${text}`;
+        const query = encodeURIComponent(prompt);
+
+        const res = await fetch(`https://grok4.hosters.club/grok4?q=${query}`);
+        const data = await res.json();
+        const reply = data.response || "⚠️ No response!";
+        typingDiv.remove();
+        appendMessage(reply, "received");
+      } catch (err) {
+        typingDiv.remove();
+        appendMessage("⚠️ Error: API request failed!", "received");
+        console.error(err);
+      }
+
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function appendMessage(text, type, temporary = false) {
+      const div = document.createElement("div");
+      div.classList.add("message", type);
+      div.innerText = text;
+      chatArea.appendChild(div);
+      if (!temporary) chatArea.scrollTop = chatArea.scrollHeight;
+    }
+  </script>
+</body>
+</html>
